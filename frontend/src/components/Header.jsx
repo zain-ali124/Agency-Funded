@@ -52,13 +52,18 @@ export default function Header() {
         <div className="bg-[#0A0F0D] border border-[#1A1F1D] rounded-full p-1.5 flex items-center gap-1 shadow-[0_0_30px_rgba(0,230,118,0.1)] overflow-visible">
           
           {/* Left Logo Icon */}
-          <div className="w-10 h-10 bg-[#00E676] rounded-full flex items-center justify-center shrink-0 ml-1">
+          <Link
+            to="/"
+            aria-label="Go to homepage"
+            title="Homepage"
+            className="w-10 h-10 bg-[#00E676] rounded-full flex items-center justify-center shrink-0 ml-1 hover:bg-[#00c853] transition-colors"
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#050A08" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
               <path d="M2 12h20"/>
             </svg>
-          </div>
+          </Link>
 
           {/* Desktop navigation links */}
           <div className="hidden md:flex items-center px-2 md:px-6 gap-3 md:gap-6 shrink-0">
