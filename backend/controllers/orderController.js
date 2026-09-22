@@ -12,6 +12,7 @@ const AuditLog = require("../models/AuditLog");
 const { generateOrderId, generateAccountNumber } = require("../utils/generateIds");
 const { computeOrderPricing, computeAffiliateCommission } = require("../utils/formulaEngine");
 const { sendEmail, templates } = require("../utils/sendEmail");
+const generateToken = require("../utils/generateToken");
 
 const REFERRAL_ATTRIBUTION_DAYS = Number(process.env.REFERRAL_ATTRIBUTION_DAYS || 30);
 
@@ -60,7 +61,7 @@ const quoteOrder = asyncHandler(async (req, res) => {
 
 // @route POST /api/orders  — create order (guest or logged-in)
 const createOrder = asyncHandler(async (req, res) => {
-  const { templateId, couponCode, referralCode, paymentMethodId, customerDetails, guestEmail, termsAccepted, termsVersion } = req.body;
+  const { templateId, couponCode, referralCode, paymentMethodId, customerDetails, guestEmail, password, termsAccepted, termsVersion } = req.body;
 
   if (!termsAccepted) {
     res.status(400);
@@ -72,6 +73,46 @@ const createOrder = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Account template not found or inactive");
   }
+
+  let checkoutUser = req.user;
+  let createdUserToken = null;
+  const checkoutEmail = (req.user ? req.user.email : guestEmail || customerDetails?.email)?.trim().toLowerCase();
+
+  if (!checkoutUser) {
+    if (!checkoutEmail || !password) {
+      res.status(400);
+      throw new Error("Email and password are required to create your customer account");
+    }
+    if (password.length < 8) {
+      res.status(400);
+      throw new Error("Password must be at least 8 characters");
+    }
+
+    const existingUser = await User.findOne({ email: checkoutEmail });
+    if (existingUser) {
+      res.status(409);
+      throw new Error("An account with this email already exists. Please log in before checking out.");
+    }
+
+    checkoutUser = await User.create({
+      firstName: customerDetails?.firstName,
+      lastName: customerDetails?.lastName,
+      email: checkoutEmail,
+      passwordHash: await User.hashPassword(password),
+      phone: customerDetails?.phone,
+      country: customerDetails?.country,
+      address: {
+        street: customerDetails?.streetAddress,
+        apartment: customerDetails?.apartment,
+        city: customerDetails?.city,
+        county: customerDetails?.county,
+        postcode: customerDetails?.postcode,
+      },
+    });
+    createdUserToken = generateToken(checkoutUser._id, checkoutUser.role);
+  }
+
+  const orderCustomerDetails = { ...customerDetails, email: checkoutUser.email };
   const originalPrice = template.salePrice ?? template.originalPrice;
 
   // Discount Priority Engine: referral beats coupon, never stack (PRD 110/36)
@@ -104,8 +145,8 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const order = await Order.create({
     orderId: generateOrderId(),
-    user: req.user?._id || null,
-    guestEmail: req.user ? undefined : guestEmail,
+    user: checkoutUser._id,
+    guestEmail: undefined,
     accountTemplate: template._id,
     accountCategory: template.category?._id,
     accountModel: template.model,
@@ -116,12 +157,12 @@ const createOrder = asyncHandler(async (req, res) => {
     couponPercentage: pricing.couponPercentage,
     couponDiscount: pricing.couponDiscount,
     affiliateId: resolvedAffiliate?._id || null,
-    referralCode: resolvedAffiliate ? referralCode.toUpperCase() : undefined,
+    referralCode: resolvedAffiliate ? (referralCode || resolvedAffiliate.referralCode).toUpperCase() : undefined,
     referralPercentage: pricing.referralPercentage,
     referralDiscount: pricing.referralDiscount,
     finalPrice: pricing.finalPrice,
     paymentMethod: paymentMethodId || undefined,
-    customerDetails,
+    customerDetails: orderCustomerDetails,
     termsAcceptance: {
       accepted: true,
       version: termsVersion || "v1",
@@ -134,7 +175,7 @@ const createOrder = asyncHandler(async (req, res) => {
   if (coupon) {
     coupon.timesUsed += 1;
     await coupon.save();
-    await CouponUsage.create({ coupon: coupon._id, user: req.user?._id, order: order._id, discountAmount: pricing.couponDiscount });
+    await CouponUsage.create({ coupon: coupon._id, user: checkoutUser._id, order: order._id, discountAmount: pricing.couponDiscount });
   }
 
   if (resolvedAffiliate) {
@@ -145,17 +186,28 @@ const createOrder = asyncHandler(async (req, res) => {
         order: null,
         converted: false,
         $or: [
-          { registeredUser: req.user?._id },
+          { registeredUser: checkoutUser._id },
           { registeredUser: null },
         ],
         createdAt: { $gte: new Date(Date.now() - REFERRAL_ATTRIBUTION_DAYS * 86400000) },
       },
-      { order: order._id, converted: true, registeredUser: req.user?._id || undefined },
+      { order: order._id, converted: true, registeredUser: checkoutUser._id },
       { sort: { createdAt: -1 } }
     );
   }
 
-  res.status(201).json({ success: true, order });
+  res.status(201).json({
+    success: true,
+    order,
+    token: createdUserToken,
+    user: createdUserToken ? {
+      id: checkoutUser._id,
+      firstName: checkoutUser.firstName,
+      lastName: checkoutUser.lastName,
+      email: checkoutUser.email,
+      role: checkoutUser.role,
+    } : undefined,
+  });
 });
 
 // @route GET /api/orders/:orderId

@@ -7,7 +7,7 @@ export default function Checkout() {
   const { templateId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   const [template, setTemplate] = useState(null);
   const [methods, setMethods] = useState([]);
@@ -20,6 +20,7 @@ export default function Checkout() {
     country: "", streetAddress: "", apartment: "", city: "", county: "", postcode: "", phone: "",
   });
   const [guestEmail, setGuestEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [order, setOrder] = useState(null);
@@ -45,9 +46,15 @@ export default function Checkout() {
     try {
       const { data } = await api.post("/orders", {
         templateId, couponCode, referralCode, paymentMethodId,
-        customerDetails: details, guestEmail: user ? undefined : guestEmail,
+        customerDetails: { ...details, email: user ? user.email : guestEmail },
+        guestEmail: user ? undefined : guestEmail,
+        password: user ? undefined : password,
         termsAccepted: true, termsVersion: "v1",
       });
+      if (data.token) {
+        localStorage.setItem("agency_funded_token", data.token);
+        await refreshUser();
+      }
       setOrder(data.order);
       setStep("pending");
     } catch (err) {
@@ -109,8 +116,13 @@ export default function Checkout() {
         <h1 className="text-2xl font-extrabold mb-2">Checkout</h1>
         {error && <p className="text-danger text-sm">{error}</p>}
         {!user && (
-          <input required type="email" placeholder="Email" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3"
-            value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} />
+          <>
+            <input required type="email" placeholder="Email" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3"
+              value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} />
+            <input required minLength={8} type="password" placeholder="Create a password (8+ characters)" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3"
+              value={password} onChange={(e) => setPassword(e.target.value)} />
+            <p className="text-xs text-textMuted">We'll create your customer account so you can track this order and access your funded account.</p>
+          </>
         )}
         <div className="grid grid-cols-2 gap-3">
           <input required placeholder="First Name" className="bg-bgSecondary border border-borderDark rounded-sm px-4 py-3"

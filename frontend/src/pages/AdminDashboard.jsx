@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import api from "../api/axios";
+import api, { apiOrigin } from "../api/axios";
 
 // --- SUB-COMPONENTS ---
 
@@ -44,6 +44,10 @@ function OrdersReview() {
     await api.put(`/admin/orders/${orderId}/reject`, { reason }); load();
   };
 
+  const paymentProofUrl = (fileUrl) => (
+    fileUrl?.startsWith("http") ? fileUrl : `${apiOrigin}${fileUrl}`
+  );
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-white tracking-tight">Payment Reviews</h2>
@@ -61,7 +65,7 @@ function OrdersReview() {
                 {o.customerDetails?.firstName} {o.customerDetails?.lastName} · {o.customerDetails?.email || o.guestEmail} · {o.accountModel} ${o.accountSize}
               </div>
               {o.paymentProof?.fileUrl && (
-                <a href={o.paymentProof.fileUrl} target="_blank" rel="noreferrer" className="inline-block mt-2 text-[#00E676] text-sm font-medium hover:underline">
+                <a href={paymentProofUrl(o.paymentProof.fileUrl)} target="_blank" rel="noreferrer" className="inline-block mt-2 text-[#00E676] text-sm font-medium hover:underline">
                   View Payment Proof ↗
                 </a>
               )}
