@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build and tooling output
+dist/
+build/
+.vite/
+coverage/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Runtime files
+backend/uploads/
+*.log
+npm-debug.log*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
