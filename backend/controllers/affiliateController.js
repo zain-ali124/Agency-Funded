@@ -71,6 +71,29 @@ const getAffiliateDashboard = asyncHandler(async (req, res) => {
     .filter((c) => ["PENDING", "APPROVED", "PAID"].includes(c.status))
     .reduce((s, c) => s + c.commissionAmount, 0) - withdrawnTotal;
 
+  const payoutRank = { PENDING: 1, UNDER_REVIEW: 2, APPROVED: 3, PROCESSING: 4, PAID: 5 };
+  const commissionRows = commissions.map((commission) => ({
+    ...commission.toObject(),
+    payoutStatus: null,
+    remainingAmount: commission.commissionAmount,
+  }));
+  const orderedWithdrawals = [...withdrawals].sort((a, b) => a.createdAt - b.createdAt);
+  for (const withdrawal of orderedWithdrawals) {
+    if (withdrawal.status === "REJECTED") continue;
+    let remaining = withdrawal.amount;
+    for (const commission of commissionRows) {
+      if (remaining <= 0 || commission.status === "REJECTED") continue;
+      const allocation = Math.min(remaining, commission.remainingAmount);
+      if (allocation > 0 && (!commission.payoutStatus || payoutRank[withdrawal.status] > payoutRank[commission.payoutStatus])) {
+        commission.payoutStatus = withdrawal.status;
+      }
+      remaining -= allocation;
+      commission.remainingAmount -= allocation;
+    }
+  }
+
+  commissionRows.forEach((commission) => delete commission.remainingAmount);
+
   res.json({
     success: true,
     referralCode: req.user.referralCode,
@@ -84,7 +107,7 @@ const getAffiliateDashboard = asyncHandler(async (req, res) => {
       availableBalance: Math.max(0, availableBalance),
       withdrawnTotal,
     },
-    commissions,
+    commissions: commissionRows,
     withdrawals,
   });
 });

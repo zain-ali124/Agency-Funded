@@ -48,7 +48,7 @@ export default function Affiliate() {
 
   if (user.affiliateStatus === "APPROVED" && dashboard) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 pb-28">
         <h1 className="text-2xl font-extrabold mb-8">Affiliate Dashboard</h1>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="card p-5"><div className="label-muted">Total Clicks</div><div className="text-2xl font-extrabold">{dashboard.stats.totalClicks}</div></div>
@@ -56,11 +56,11 @@ export default function Affiliate() {
           <div className="card p-5"><div className="label-muted">Total Commission</div><div className="text-2xl font-extrabold text-brand">${dashboard.stats.totalCommission}</div></div>
           <div className="card p-5"><div className="label-muted">Available Balance</div><div className="text-2xl font-extrabold text-brand">${dashboard.stats.availableBalance}</div></div>
         </div>
-        <div className="card p-6 mb-8">
+        <div className="card p-4 sm:p-6 mb-8 min-w-0">
           <div className="label-muted mb-2">Your Referral Link</div>
-          <div className="flex gap-2">
-            <input readOnly value={dashboard.referralLink} className="flex-1 bg-bgSecondary border border-borderDark rounded-sm px-4 py-2 text-sm" />
-            <button onClick={() => navigator.clipboard.writeText(dashboard.referralLink)} className="btn-secondary text-sm">Copy</button>
+          <div className="flex flex-col sm:flex-row gap-2 min-w-0">
+            <input readOnly value={dashboard.referralLink} title={dashboard.referralLink} className="min-w-0 w-full flex-1 bg-bgSecondary border border-borderDark rounded-sm px-4 py-2 text-sm truncate" />
+            <button onClick={() => navigator.clipboard.writeText(dashboard.referralLink)} className="btn-secondary text-sm shrink-0 w-full sm:w-auto">Copy</button>
           </div>
         </div>
         <div className="card p-6 mb-8">
@@ -74,10 +74,11 @@ export default function Affiliate() {
             <div className="md:col-span-2 flex items-center justify-between gap-4"><p className="text-sm text-textMuted">{withdrawalMessage}</p><button className="btn-primary">Request Withdrawal</button></div>
           </form>
         </div>
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6 overflow-hidden">
           <div className="label-muted mb-4">Recent Commissions</div>
-          <table className="w-full text-sm">
-            <thead className="text-textMuted text-left"><tr><th className="pb-2">Order</th><th>Original Price</th><th>Commission</th><th>Status</th></tr></thead>
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead className="text-textMuted text-left"><tr><th className="pb-2">Order</th><th>Original Price</th><th>Commission</th><th>Commission Status</th><th>Payout</th></tr></thead>
             <tbody>
               {dashboard.commissions.map((c) => (
                 <tr key={c._id} className="border-t border-borderDark">
@@ -85,10 +86,12 @@ export default function Affiliate() {
                   <td>${c.originalPrice}</td>
                   <td className="text-brand">${c.commissionAmount}</td>
                   <td>{c.status}</td>
+                  <td className={c.payoutStatus === "PAID" ? "text-brand" : "text-textMuted"}>{c.payoutStatus || "Not withdrawn"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
         <div className="card p-6 mt-8">
           <div className="label-muted mb-4">Withdrawal history</div>
