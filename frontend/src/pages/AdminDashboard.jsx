@@ -81,6 +81,162 @@ function OrdersReview() {
   );
 }
 
+const emptyPaymentMethod = {
+  methodName: "",
+  accountName: "",
+  accountNumber: "",
+  iban: "",
+  walletAddress: "",
+  qrCodeUrl: "",
+  instructions: "",
+  minimumAmount: 0,
+  active: true,
+  displayOrder: 0,
+};
+
+function PaymentMethods() {
+  const [methods, setMethods] = useState([]);
+  const [form, setForm] = useState(emptyPaymentMethod);
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const load = () => {
+    setLoading(true);
+    api.get("/payment-methods/admin")
+      .then(({ data }) => setMethods(data.methods))
+      .catch(() => setError("Unable to load payment methods."))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const updateField = (event) => {
+    const { name, value, type, checked } = event.target;
+    setForm((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
+  };
+
+  const resetForm = () => {
+    setForm(emptyPaymentMethod);
+    setEditingId(null);
+    setError("");
+  };
+
+  const editMethod = (method) => {
+    setEditingId(method._id);
+    setForm({ ...emptyPaymentMethod, ...method });
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const saveMethod = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    const payload = {
+      ...form,
+      minimumAmount: Number(form.minimumAmount) || 0,
+      displayOrder: Number(form.displayOrder) || 0,
+    };
+
+    try {
+      if (editingId) await api.put(`/payment-methods/${editingId}`, payload);
+      else await api.post("/payment-methods", payload);
+      resetForm();
+      load();
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Unable to save payment method.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleActive = async (method) => {
+    try {
+      await api.put(`/payment-methods/${method._id}`, { active: !method.active });
+      load();
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Unable to update payment method.");
+    }
+  };
+
+  const inputClass = "w-full bg-[#050A08] border border-[#1A3326] text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#00E676] transition-colors";
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-white tracking-tight">Payment Methods</h2>
+        <p className="text-sm text-gray-400 mt-1">Manage the payment details customers see at checkout.</p>
+      </div>
+
+      {error && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 p-4 rounded-xl">{error}</p>}
+
+      <form onSubmit={saveMethod} className="bg-[#0A0F0D] border border-[#1A3326] rounded-2xl p-4 sm:p-6 space-y-5">
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="font-semibold text-white">{editingId ? "Edit payment method" : "Add payment method"}</h3>
+          {editingId && <button type="button" onClick={resetForm} className="text-sm text-gray-400 hover:text-white">Cancel edit</button>}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            ["methodName", "Method name", true],
+            ["accountName", "Account name"],
+            ["accountNumber", "Account number"],
+            ["iban", "IBAN"],
+            ["walletAddress", "Wallet address"],
+            ["qrCodeUrl", "QR code URL"],
+          ].map(([name, label, required]) => (
+            <label key={name} className="text-sm text-gray-400 space-y-2">
+              {label}
+              <input name={name} value={form[name]} onChange={updateField} required={required} className={inputClass} />
+            </label>
+          ))}
+          <label className="text-sm text-gray-400 space-y-2">
+            Minimum amount
+            <input type="number" min="0" step="0.01" name="minimumAmount" value={form.minimumAmount} onChange={updateField} className={inputClass} />
+          </label>
+          <label className="text-sm text-gray-400 space-y-2">
+            Display order
+            <input type="number" min="0" name="displayOrder" value={form.displayOrder} onChange={updateField} className={inputClass} />
+          </label>
+        </div>
+        <label className="block text-sm text-gray-400 space-y-2">
+          Instructions
+          <textarea name="instructions" value={form.instructions} onChange={updateField} rows="3" className={inputClass} />
+        </label>
+        <label className="flex items-center gap-3 text-sm text-gray-300">
+          <input type="checkbox" name="active" checked={form.active} onChange={updateField} className="h-4 w-4 accent-[#00E676]" />
+          Available at checkout
+        </label>
+        <button type="submit" disabled={saving} className="bg-[#00E676] text-[#050A08] font-semibold text-sm py-2.5 px-5 rounded-lg hover:bg-[#00c853] disabled:opacity-50 transition-colors">
+          {saving ? "Saving..." : editingId ? "Update payment method" : "Add payment method"}
+        </button>
+      </form>
+
+      {loading && <p className="text-gray-400 text-sm animate-pulse">Loading payment methods...</p>}
+      {!loading && methods.length === 0 && <p className="text-gray-400 text-sm bg-[#0A0F0D] border border-[#1A3326] p-6 rounded-2xl">No payment methods configured.</p>}
+      <div className="grid gap-4">
+        {methods.map((method) => (
+          <div key={method._id} className="bg-[#0A0F0D] border border-[#1A3326] rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row justify-between gap-4">
+            <div className="space-y-1 min-w-0 break-words">
+              <div className="font-semibold text-lg text-white">{method.methodName}</div>
+              <div className="text-sm text-gray-400">{method.accountName || method.accountNumber || method.walletAddress || "No account details"}</div>
+              <div className="text-xs text-gray-500">Minimum: ${method.minimumAmount || 0} · Order: {method.displayOrder || 0}</div>
+              {method.instructions && <div className="text-sm text-gray-500 mt-2">{method.instructions}</div>}
+            </div>
+            <div className="flex gap-3 items-center">
+              <button type="button" onClick={() => toggleActive(method)} className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors ${method.active ? "bg-[#00E676]/10 text-[#00E676]" : "bg-gray-800 text-gray-400"}`}>
+                {method.active ? "Active" : "Inactive"}
+              </button>
+              <button type="button" onClick={() => editMethod(method)} className="bg-[#1A3326] text-white font-medium text-sm py-2 px-4 rounded-lg hover:bg-[#2A4536] transition-colors">Edit</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Templates() {
   const [templates, setTemplates] = useState([]);
   const load = () => api.get("/accounts-catalog/templates", { params: { admin: true } }).then(({ data }) => setTemplates(data.templates));
@@ -362,6 +518,7 @@ export default function AdminDashboard() {
     ["", "Overview", "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"],
     ["users", "All Users", "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"],
     ["orders", "Payment Reviews", "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"],
+    ["payments", "Payment Methods", "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"],
     ["templates", "Pricing", "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"],
     ["affiliates", "Affiliates", "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"],
     ["withdrawals", "Withdrawals", "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"],
@@ -428,6 +585,7 @@ export default function AdminDashboard() {
             <Route index element={<Overview />} />
             <Route path="users" element={<AllUsers />} />
             <Route path="orders" element={<OrdersReview />} />
+            <Route path="payments" element={<PaymentMethods />} />
             <Route path="templates" element={<Templates />} />
             <Route path="affiliates" element={<AffiliateApplications />} />
             <Route path="withdrawals" element={<AffiliateWithdrawals />} />
