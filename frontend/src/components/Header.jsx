@@ -19,6 +19,9 @@ export default function Header() {
               alt="Agency Funded logo"
               className="h-10 w-auto object-contain"
             />
+            <span className="font-bold tracking-[0.12em] text-sm text-white">
+              AGENCY <span className="text-[#00E676]">FUNDED</span>
+            </span>
           </Link>
 
           {/* Auth / User Section */}
