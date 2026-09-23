@@ -111,7 +111,7 @@ export default function Affiliate() {
   return (
     <div className="max-w-lg mx-auto px-6 py-24">
       <h1 className="text-2xl font-extrabold mb-2">Become an Affiliate</h1>
-      <p className="text-textMuted mb-8">Earn 40% commission on every referral. Your audience gets a 40% discount.</p>
+      <p className="text-textMuted mb-8">Earn some % commission on every referral. Your audience also gets a  discount.</p>
       <form onSubmit={apply} className="card p-6 space-y-4">
         <input placeholder="Website (optional)" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
         <input placeholder="Social Media" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.socialMedia} onChange={(e) => setForm({ ...form, socialMedia: e.target.value })} />
