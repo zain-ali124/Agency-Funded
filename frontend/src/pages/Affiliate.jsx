@@ -113,7 +113,7 @@ export default function Affiliate() {
       <h1 className="text-2xl font-extrabold mb-2">Become an Affiliate</h1>
       <p className="text-textMuted mb-8">Earn some % commission on every referral. Your audience also gets a  discount.</p>
       <form onSubmit={apply} className="card p-6 space-y-4">
-        <input placeholder="Website (optional)" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
+        <input placeholder="Whatsapp (optional)" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
         <input placeholder="Social Media" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.socialMedia} onChange={(e) => setForm({ ...form, socialMedia: e.target.value })} />
         <input placeholder="Promotion Method" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.promotionMethod} onChange={(e) => setForm({ ...form, promotionMethod: e.target.value })} />
         <input placeholder="Audience Size" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.audienceSize} onChange={(e) => setForm({ ...form, audienceSize: e.target.value })} />
