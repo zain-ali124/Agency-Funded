@@ -40,7 +40,7 @@ export default function Affiliate() {
     return (
       <div className="max-w-xl mx-auto px-6 py-24 text-center">
         <h1 className="text-2xl font-extrabold mb-4">Become an Affiliate</h1>
-        <p className="text-textMuted mb-6">Login or create an account to apply for the Agency Funded affiliate program — 40% referral discount for your audience, 40% commission for you.</p>
+        <p className="text-textMuted mb-6">Login or create an account to apply for the Agency Funded affiliate program —some% referral discount for your audience, and commission for you.</p>
         <a href="/login" className="btn-primary">Login</a>
       </div>
     );
