@@ -14,12 +14,11 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 sm:h-24 flex items-center justify-between">
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-[#00E676] rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#050A08" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-              </svg>
-            </div>
-            <span className="font-bold tracking-[0.12em] text-sm text-white">AGENCY <span className="text-[#00E676]">FUNDED</span></span>
+            <img
+              src="https://res.cloudinary.com/dr7x4cvfp/image/upload/v1790182670/IMG-20260923-WA0001-removebg-preview_ygu2km.png"
+              alt="Agency Funded logo"
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           {/* Auth / User Section */}
