@@ -469,11 +469,11 @@ function AllUsers() {
               </div>
               <div>
                 <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Phone</div>
-                <div className="text-gray-300">{user.phone || "—"}</div>
+                <div className="text-gray-300">{user.phone || user.contact?.phone || user.customerDetails?.phone || "—"}</div>
               </div>
               <div>
                 <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Country</div>
-                <div className="text-gray-300">{user.country || "—"}</div>
+                <div className="text-gray-300">{user.country || user.contact?.country || user.customerDetails?.country || "—"}</div>
               </div>
               <div>
                 <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Email Verified</div>
@@ -485,7 +485,7 @@ function AllUsers() {
               </div>
               <div>
                 <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Referred By</div>
-                <div className="text-gray-300 break-all font-mono text-xs">{user.referredBy || "—"}</div>
+                <div className="text-gray-300">{user.referredBy || user.referredByName || "—"}</div>
               </div>
               <div>
                 <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Joined</div>

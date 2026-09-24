@@ -68,8 +68,25 @@ const adminListUsers = asyncHandler(async (req, res) => {
       { email: new RegExp(search, "i") },
     ];
   }
-  const users = await User.find(filter).select("-passwordHash").sort({ createdAt: -1 });
-  res.json({ success: true, users });
+  const users = await User.find(filter)
+    .populate("referredBy", "firstName lastName email")
+    .select("-passwordHash")
+    .sort({ createdAt: -1 });
+
+  const normalizedUsers = users.map((user) => {
+    const referredBy = user.referredBy;
+    const referredByName = referredBy
+      ? `${referredBy.firstName || ""} ${referredBy.lastName || ""}`.trim() || referredBy.email || "Unknown affiliate"
+      : "—";
+
+    return {
+      ...user.toObject(),
+      referredBy: referredByName,
+      referredById: referredBy?._id || null,
+    };
+  });
+
+  res.json({ success: true, users: normalizedUsers });
 });
 
 // @route PUT /api/admin/users/:id/role  (SUPER_ADMIN only, enforced in routes)
