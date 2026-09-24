@@ -47,6 +47,8 @@ export default function Affiliate() {
   }
 
   if (user.affiliateStatus === "APPROVED" && dashboard) {
+    const referralCode = dashboard.referralCode || (dashboard.referralLink ? dashboard.referralLink.split("ref=")[1] : "");
+
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 pb-28">
         <h1 className="text-2xl font-extrabold mb-8">Affiliate Dashboard</h1>
@@ -57,10 +59,10 @@ export default function Affiliate() {
           <div className="card p-5"><div className="label-muted">Available Balance</div><div className="text-2xl font-extrabold text-brand">${dashboard.stats.availableBalance}</div></div>
         </div>
         <div className="card p-4 sm:p-6 mb-8 min-w-0">
-          <div className="label-muted mb-2">Your Referral Link</div>
+          <div className="label-muted mb-2">Your Referral Code</div>
           <div className="flex flex-col sm:flex-row gap-2 min-w-0">
-            <input readOnly value={dashboard.referralLink} title={dashboard.referralLink} className="min-w-0 w-full flex-1 bg-bgSecondary border border-borderDark rounded-sm px-4 py-2 text-sm truncate" />
-            <button onClick={() => navigator.clipboard.writeText(dashboard.referralLink)} className="btn-secondary text-sm shrink-0 w-full sm:w-auto">Copy</button>
+            <input readOnly value={referralCode} title={referralCode} className="min-w-0 w-full flex-1 bg-bgSecondary border border-borderDark rounded-sm px-4 py-2 text-sm truncate" />
+            <button onClick={() => navigator.clipboard.writeText(referralCode)} className="btn-secondary text-sm shrink-0 w-full sm:w-auto">Copy</button>
           </div>
         </div>
         <div className="card p-6 mb-8">
