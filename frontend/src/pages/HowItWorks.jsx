@@ -1,7 +1,7 @@
 import React from "react";
 
 const steps = [
-  ["01", "Choose Account", "Select Instant, 1-Step or 3-Step and your account size."],
+  ["01", "Choose Account", "Select Instant or 2-Step and your account size."],
   ["02", "Complete Payment", "Pay via bank transfer, JazzCash, Easypaisa or crypto."],
   ["03", "Upload Payment Proof", "Attach your receipt or screenshot for manual verification."],
   ["04", "Get Funded", "Once approved, receive your credentials and start trading."],

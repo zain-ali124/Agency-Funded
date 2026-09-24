@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const MODEL_LABELS = { INSTANT: "Instant", ONE_STEP: "1 Step", THREE_STEP: "3 Step" };
+const MODEL_LABELS = { INSTANT: "Instant", ONE_STEP: "2 Step" };
 
 export default function AccountCard({ template }) {
   const price = template.salePrice ?? template.originalPrice;

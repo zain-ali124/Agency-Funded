@@ -13,8 +13,7 @@ export default function Footer() {
           <div className="label-muted mb-3">Accounts</div>
           <ul className="space-y-2 text-sm text-textSecondary">
             <li><Link to="/accounts?model=INSTANT" className="hover:text-white">Instant</Link></li>
-            <li><Link to="/accounts?model=ONE_STEP" className="hover:text-white">1 Step</Link></li>
-            <li><Link to="/accounts?model=THREE_STEP" className="hover:text-white">3 Step</Link></li>
+            <li><Link to="/accounts?model=ONE_STEP" className="hover:text-white">2 Step</Link></li>
           </ul>
         </div>
         <div>

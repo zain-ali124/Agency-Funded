@@ -7,7 +7,6 @@ const MODELS = [
   { key: "", label: "All" },
   { key: "INSTANT", label: "Instant" },
   { key: "ONE_STEP", label: "2 Step" },
-  { key: "THREE_STEP", label: "3 Step" },
 ];
 
 export default function Accounts() {

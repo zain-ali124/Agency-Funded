@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
-const MODEL_LABELS = { INSTANT: "Instant", ONE_STEP: "1 Step", THREE_STEP: "3 Step" };
+const MODEL_LABELS = { INSTANT: "Instant", ONE_STEP: "2 Step" };
 
 export default function AccountDetail() {
   const { id } = useParams();
