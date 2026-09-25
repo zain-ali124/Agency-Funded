@@ -9,6 +9,9 @@ export default function Affiliate() {
   const [withdrawal, setWithdrawal] = useState({ amount: "", paymentMethod: "", paymentAddress: "", additionalInfo: "" });
   const [withdrawalMessage, setWithdrawalMessage] = useState("");
   const [form, setForm] = useState({ website: "", socialMedia: "", promotionMethod: "", audienceSize: "" });
+  const [applying, setApplying] = useState(false);
+  const [requestingWithdrawal, setRequestingWithdrawal] = useState(false);
+  const [copyingCode, setCopyingCode] = useState(false);
 
   useEffect(() => {
     if (user?.affiliateStatus === "APPROVED") {
@@ -18,13 +21,19 @@ export default function Affiliate() {
 
   const apply = async (e) => {
     e.preventDefault();
-    await api.post("/affiliate/apply", form);
-    setApplied(true);
+    setApplying(true);
+    try {
+      await api.post("/affiliate/apply", form);
+      setApplied(true);
+    } finally {
+      setApplying(false);
+    }
   };
 
   const requestWithdrawal = async (e) => {
     e.preventDefault();
     setWithdrawalMessage("");
+    setRequestingWithdrawal(true);
     try {
       await api.post("/affiliate/withdraw", withdrawal);
       setWithdrawal({ amount: "", paymentMethod: "", paymentAddress: "", additionalInfo: "" });
@@ -33,7 +42,15 @@ export default function Affiliate() {
       setDashboard(data);
     } catch (err) {
       setWithdrawalMessage(err.response?.data?.message || "Unable to submit withdrawal request.");
+    } finally {
+      setRequestingWithdrawal(false);
     }
+  };
+
+  const copyReferralCode = async (referralCode) => {
+    setCopyingCode(true);
+    await navigator.clipboard.writeText(referralCode);
+    setCopyingCode(false);
   };
 
   if (!user) {
@@ -62,7 +79,7 @@ export default function Affiliate() {
           <div className="label-muted mb-2">Your Referral Code</div>
           <div className="flex flex-col sm:flex-row gap-2 min-w-0">
             <input readOnly value={referralCode} title={referralCode} className="min-w-0 w-full flex-1 bg-bgSecondary border border-borderDark rounded-sm px-4 py-2 text-sm truncate" />
-            <button onClick={() => navigator.clipboard.writeText(referralCode)} className="btn-secondary text-sm shrink-0 w-full sm:w-auto">Copy</button>
+            <button onClick={() => copyReferralCode(referralCode)} disabled={copyingCode} className="btn-secondary text-sm shrink-0 w-full sm:w-auto">{copyingCode ? "Copying..." : "Copy"}</button>
           </div>
         </div>
         <div className="card p-6 mb-8">
@@ -73,7 +90,7 @@ export default function Affiliate() {
             <input required placeholder="Payment method" value={withdrawal.paymentMethod} onChange={(e) => setWithdrawal({ ...withdrawal, paymentMethod: e.target.value })} className="bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" />
             <input required placeholder="Payment address / account" value={withdrawal.paymentAddress} onChange={(e) => setWithdrawal({ ...withdrawal, paymentAddress: e.target.value })} className="bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" />
             <input placeholder="Additional information" value={withdrawal.additionalInfo} onChange={(e) => setWithdrawal({ ...withdrawal, additionalInfo: e.target.value })} className="bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" />
-            <div className="md:col-span-2 flex items-center justify-between gap-4"><p className="text-sm text-textMuted">{withdrawalMessage}</p><button className="btn-primary">Request Withdrawal</button></div>
+            <div className="md:col-span-2 flex items-center justify-between gap-4"><p className="text-sm text-textMuted">{withdrawalMessage}</p><button disabled={requestingWithdrawal} className="btn-primary">{requestingWithdrawal ? "Submitting..." : "Request Withdrawal"}</button></div>
           </form>
         </div>
         <div className="card p-4 sm:p-6 overflow-hidden">
@@ -119,7 +136,7 @@ export default function Affiliate() {
         <input placeholder="Social Media" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.socialMedia} onChange={(e) => setForm({ ...form, socialMedia: e.target.value })} />
         <input placeholder="Promotion Method" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.promotionMethod} onChange={(e) => setForm({ ...form, promotionMethod: e.target.value })} />
         <input placeholder="Audience Size" className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-3" value={form.audienceSize} onChange={(e) => setForm({ ...form, audienceSize: e.target.value })} />
-        <button className="btn-primary w-full">Apply Now</button>
+        <button disabled={applying} className="btn-primary w-full">{applying ? "Submitting..." : "Apply Now"}</button>
       </form>
     </div>
   );

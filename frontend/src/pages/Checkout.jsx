@@ -27,6 +27,8 @@ export default function Checkout() {
   const [proofFile, setProofFile] = useState(null);
   const [step, setStep] = useState("details"); // details -> pending -> submitted
   const [error, setError] = useState("");
+  const [submittingOrder, setSubmittingOrder] = useState(false);
+  const [uploadingProof, setUploadingProof] = useState(false);
 
   useEffect(() => {
     api.get(`/accounts-catalog/templates/${templateId}`).then(({ data }) => setTemplate(data.template));
@@ -43,6 +45,7 @@ export default function Checkout() {
     e.preventDefault();
     setError("");
     if (!termsAccepted) { setError("Please accept the Terms & Conditions to continue."); return; }
+    setSubmittingOrder(true);
     try {
       const { data } = await api.post("/orders", {
         templateId, couponCode, referralCode, paymentMethodId,
@@ -59,6 +62,8 @@ export default function Checkout() {
       setStep("pending");
     } catch (err) {
       setError(err.response?.data?.message || "Could not create order");
+    } finally {
+      setSubmittingOrder(false);
     }
   };
 
@@ -67,11 +72,15 @@ export default function Checkout() {
     if (!proofFile) { setError("Please attach your payment proof."); return; }
     const form = new FormData();
     form.append("proof", proofFile);
+    setUploadingProof(true);
+    setError("");
     try {
       await api.post(`/orders/${order.orderId}/payment-proof`, form, { headers: { "Content-Type": "multipart/form-data" } });
       setStep("submitted");
     } catch (err) {
       setError(err.response?.data?.message || "Upload failed");
+    } finally {
+      setUploadingProof(false);
     }
   };
 
@@ -104,7 +113,7 @@ export default function Checkout() {
         <form onSubmit={submitProof} className="card p-6 space-y-4">
           {error && <p className="text-danger text-sm">{error}</p>}
           <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setProofFile(e.target.files[0])} className="w-full text-sm" />
-          <button className="btn-primary w-full">Submit Payment Proof</button>
+          <button disabled={uploadingProof} className="btn-primary w-full">{uploadingProof ? "Uploading..." : "Submit Payment Proof"}</button>
         </form>
       </div>
     );
@@ -160,7 +169,7 @@ export default function Checkout() {
           I agree to the Terms & Conditions, trading rules, payout policy and risk disclosure.
         </label>
 
-        <button className="btn-primary w-full" disabled={!paymentMethodId}>Continue to Payment</button>
+        <button className="btn-primary w-full" disabled={!paymentMethodId || submittingOrder}>{submittingOrder ? "Processing..." : "Continue to Payment"}</button>
       </form>
 
       <div>

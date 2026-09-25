@@ -6,6 +6,13 @@ export default function Header() {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await logout();
+    navigate("/");
+  };
 
   return (
     <>
@@ -34,10 +41,11 @@ export default function Header() {
                   <Link to="/dashboard" className="text-sm text-gray-400 hover:text-white transition-colors">Dashboard</Link>
                 )}
                 <button
-                  onClick={async () => { await logout(); navigate("/"); }}
+                  onClick={handleLogout}
+                  disabled={loggingOut}
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
-                  Logout
+                  {loggingOut ? "Logging out..." : "Logout"}
                 </button>
               </>
             ) : (

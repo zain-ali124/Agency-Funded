@@ -35,7 +35,6 @@ export default function Footer() {
       </div>
       <div className="border-t border-borderDark px-6 pt-6 pb-28 md:pb-24 text-center text-textMuted text-xs">
         <p>© {new Date().getFullYear()} Agency Funded. All rights reserved.</p>
-        <p className="mt-2">Developed by <span className="text-textPrimary font-medium">Zayn</span> · <a href="mailto:zaynalie05@gmail.com" className="hover:text-brand transition-colors">zaynalie05@gmail.com</a></p>
       </div>
     </footer>
   );

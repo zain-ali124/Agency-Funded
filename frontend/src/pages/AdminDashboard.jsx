@@ -35,13 +35,18 @@ function Overview() {
 
 function OrdersReview() {
   const [orders, setOrders] = useState([]);
+  const [action, setAction] = useState("");
   const load = () => api.get("/admin/orders", { params: { status: "PAYMENT_UNDER_REVIEW" } }).then(({ data }) => setOrders(data.orders));
   useEffect(() => { load(); }, []);
 
-  const approve = async (orderId) => { await api.put(`/admin/orders/${orderId}/approve`); load(); };
+  const approve = async (orderId) => {
+    setAction(`approve-${orderId}`);
+    try { await api.put(`/admin/orders/${orderId}/approve`); await load(); } finally { setAction(""); }
+  };
   const reject = async (orderId) => {
     const reason = prompt("Rejection reason?") || "Not specified";
-    await api.put(`/admin/orders/${orderId}/reject`, { reason }); load();
+    setAction(`reject-${orderId}`);
+    try { await api.put(`/admin/orders/${orderId}/reject`, { reason }); await load(); } finally { setAction(""); }
   };
 
   const paymentProofUrl = (fileUrl) => (
@@ -71,11 +76,11 @@ function OrdersReview() {
               )}
             </div>
             <div className="flex gap-3 w-full md:w-auto">
-              <button onClick={() => approve(o.orderId)} className="flex-1 md:flex-none bg-[#00E676] text-[#050A08] font-semibold text-sm py-2 px-6 rounded-lg hover:bg-[#00c853] transition-colors">
-                Approve
+              <button disabled={action} onClick={() => approve(o.orderId)} className="flex-1 md:flex-none bg-[#00E676] text-[#050A08] font-semibold text-sm py-2 px-6 rounded-lg hover:bg-[#00c853] disabled:opacity-50 transition-colors">
+                {action === `approve-${o.orderId}` ? "Approving..." : "Approve"}
               </button>
-              <button onClick={() => reject(o.orderId)} className="flex-1 md:flex-none bg-[#1A3326] text-white font-medium text-sm py-2 px-6 rounded-lg hover:bg-[#2A4536] transition-colors">
-                Reject
+              <button disabled={action} onClick={() => reject(o.orderId)} className="flex-1 md:flex-none bg-[#1A3326] text-white font-medium text-sm py-2 px-6 rounded-lg hover:bg-[#2A4536] disabled:opacity-50 transition-colors">
+                {action === `reject-${o.orderId}` ? "Rejecting..." : "Reject"}
               </button>
             </div>
           </div>
@@ -105,6 +110,7 @@ function PaymentMethods() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [togglingId, setTogglingId] = useState("");
 
   const load = () => {
     setLoading(true);
@@ -157,11 +163,14 @@ function PaymentMethods() {
   };
 
   const toggleActive = async (method) => {
+    setTogglingId(method._id);
     try {
       await api.put(`/payment-methods/${method._id}`, { active: !method.active });
       load();
     } catch (requestError) {
       setError(requestError.response?.data?.message || "Unable to update payment method.");
+    } finally {
+      setTogglingId("");
     }
   };
 
@@ -229,8 +238,8 @@ function PaymentMethods() {
               {method.instructions && <div className="text-sm text-gray-500 mt-2">{method.instructions}</div>}
             </div>
             <div className="flex gap-3 items-center">
-              <button type="button" onClick={() => toggleActive(method)} className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors ${method.active ? "bg-[#00E676]/10 text-[#00E676]" : "bg-gray-800 text-gray-400"}`}>
-                {method.active ? "Active" : "Inactive"}
+              <button type="button" disabled={togglingId === method._id} onClick={() => toggleActive(method)} className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors disabled:opacity-50 ${method.active ? "bg-[#00E676]/10 text-[#00E676]" : "bg-gray-800 text-gray-400"}`}>
+                {togglingId === method._id ? "Saving..." : method.active ? "Active" : "Inactive"}
               </button>
               <button type="button" onClick={() => editMethod(method)} className="bg-[#1A3326] text-white font-medium text-sm py-2 px-4 rounded-lg hover:bg-[#2A4536] transition-colors">Edit</button>
             </div>
@@ -295,9 +304,13 @@ function Templates() {
 
 function AffiliateApplications() {
   const [apps, setApps] = useState([]);
+  const [action, setAction] = useState("");
   const load = () => api.get("/affiliate/admin/applications", { params: { status: "PENDING" } }).then(({ data }) => setApps(data.applications));
   useEffect(() => { load(); }, []);
-  const review = async (id, decision) => { await api.put(`/affiliate/admin/applications/${id}`, { decision }); load(); };
+  const review = async (id, decision) => {
+    setAction(`${id}-${decision}`);
+    try { await api.put(`/affiliate/admin/applications/${id}`, { decision }); await load(); } finally { setAction(""); }
+  };
 
   return (
     <div className="space-y-6">
@@ -312,8 +325,8 @@ function AffiliateApplications() {
               <div className="text-sm text-gray-400 mt-1">{a.email} · <span className="text-[#00E676]">{a.promotionMethod}</span></div>
             </div>
             <div className="flex gap-3 w-full md:w-auto">
-              <button onClick={() => review(a._id, "APPROVED")} className="flex-1 md:flex-none bg-[#00E676] text-[#050A08] font-semibold text-sm py-2 px-6 rounded-lg hover:bg-[#00c853] transition-colors">Approve</button>
-              <button onClick={() => review(a._id, "REJECTED")} className="flex-1 md:flex-none bg-[#1A3326] text-white font-medium text-sm py-2 px-6 rounded-lg hover:bg-[#2A4536] transition-colors">Reject</button>
+              <button disabled={action} onClick={() => review(a._id, "APPROVED")} className="flex-1 md:flex-none bg-[#00E676] text-[#050A08] font-semibold text-sm py-2 px-6 rounded-lg hover:bg-[#00c853] disabled:opacity-50 transition-colors">{action === `${a._id}-APPROVED` ? "Approving..." : "Approve"}</button>
+              <button disabled={action} onClick={() => review(a._id, "REJECTED")} className="flex-1 md:flex-none bg-[#1A3326] text-white font-medium text-sm py-2 px-6 rounded-lg hover:bg-[#2A4536] disabled:opacity-50 transition-colors">{action === `${a._id}-REJECTED` ? "Rejecting..." : "Reject"}</button>
             </div>
           </div>
         ))}
@@ -324,12 +337,16 @@ function AffiliateApplications() {
 
 function AffiliateWithdrawals() {
   const [withdrawals, setWithdrawals] = useState([]);
+  const [action, setAction] = useState("");
   const load = () => api.get("/affiliate/admin/withdrawals", { params: { status: "PENDING" } }).then(({ data }) => setWithdrawals(data.withdrawals));
   useEffect(() => { load(); }, []);
   const process = async (id, status) => {
     const transactionReference = status === "PAID" ? (prompt("Transaction reference?") || "") : "";
-    await api.put(`/affiliate/admin/withdrawals/${id}`, { status, transactionReference });
-    load();
+    setAction(`${id}-${status}`);
+    try {
+      await api.put(`/affiliate/admin/withdrawals/${id}`, { status, transactionReference });
+      await load();
+    } finally { setAction(""); }
   };
   return (
     <div className="space-y-6">
@@ -347,8 +364,8 @@ function AffiliateWithdrawals() {
               {item.additionalInfo && <div className="text-sm text-gray-500 italic">"{item.additionalInfo}"</div>}
             </div>
             <div className="flex gap-3 w-full md:w-auto">
-              <button onClick={() => process(item._id, "PAID")} className="flex-1 md:flex-none bg-[#00E676] text-[#050A08] font-semibold text-sm py-2 px-6 rounded-lg hover:bg-[#00c853] transition-colors">Mark Paid</button>
-              <button onClick={() => process(item._id, "REJECTED")} className="flex-1 md:flex-none bg-[#1A3326] text-white font-medium text-sm py-2 px-6 rounded-lg hover:bg-[#2A4536] transition-colors">Reject</button>
+              <button disabled={action} onClick={() => process(item._id, "PAID")} className="flex-1 md:flex-none bg-[#00E676] text-[#050A08] font-semibold text-sm py-2 px-6 rounded-lg hover:bg-[#00c853] disabled:opacity-50 transition-colors">{action === `${item._id}-PAID` ? "Processing..." : "Mark Paid"}</button>
+              <button disabled={action} onClick={() => process(item._id, "REJECTED")} className="flex-1 md:flex-none bg-[#1A3326] text-white font-medium text-sm py-2 px-6 rounded-lg hover:bg-[#2A4536] disabled:opacity-50 transition-colors">{action === `${item._id}-REJECTED` ? "Rejecting..." : "Reject"}</button>
             </div>
           </div>
         ))}
@@ -440,7 +457,7 @@ function AllUsers() {
             placeholder="Search name or email" 
             className="flex-1 sm:w-64 bg-[#050A08] border border-[#1A3326] text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#00E676] transition-colors" 
           />
-          <button className="bg-[#1A3326] text-white font-medium text-sm py-2 px-4 rounded-lg hover:bg-[#2A4536] transition-colors">Search</button>
+          <button disabled={loading} className="bg-[#1A3326] text-white font-medium text-sm py-2 px-4 rounded-lg hover:bg-[#2A4536] disabled:opacity-50 transition-colors">{loading ? "Searching..." : "Search"}</button>
         </form>
       </div>
 
