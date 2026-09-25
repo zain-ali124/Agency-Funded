@@ -25,7 +25,7 @@ async function sendEmail({ to, subject, html, text }) {
   }
   try {
     const info = await getTransporter().sendMail({
-      from: process.env.FROM_EMAIL || "no-reply@agencyfunded.com",
+      from: process.env.FROM_EMAIL || process.env.SMTP_USER,
       to,
       subject,
       html,
@@ -40,8 +40,8 @@ async function sendEmail({ to, subject, html, text }) {
 
 const templates = {
   paymentUnderReview: (name) => ({
-    subject: "Payment Under Review — Agency Funded",
-    html: `<p>Hi ${name},</p><p>Your payment proof has been received and is currently under review by the Agency Funded team. You will receive another email once your order has been approved or if additional information is required.</p>`,
+    subject: "Payment Review Request Received — Agency Funded",
+    html: `<p>Hi ${name},</p><p>Your payment review request has been received. Our team is reviewing your request now. Within 24 hours, or after the review is complete, we will send you a confirmation email with your funded account details.</p><p>Please keep your Agency Funded login email and the password you created at checkout available for signing in.</p>`,
   }),
   paymentApproved: (name, orderId) => ({
     subject: "Payment Approved — Agency Funded",
@@ -53,7 +53,7 @@ const templates = {
   }),
   accountActivated: (name, account) => ({
     subject: "Your Agency Funded Account Is Active",
-    html: `<p>Hi ${name},</p><p>Your ${account.accountSize / 1000}K ${account.model} account (${account.accountNumber}) is now active. Log in to your dashboard to view your credentials and trading rules.</p>`,
+    html: `<p>Hi ${name},</p><p>Your ${account.accountSize / 1000}K ${account.model} account (${account.accountNumber}) is now active.</p><p>Log in with the email address and password you created at checkout to access your funded account and trading rules.</p>`,
   }),
   affiliateApplicationReceived: (name) => ({
     subject: "Affiliate Application Received — Agency Funded",
