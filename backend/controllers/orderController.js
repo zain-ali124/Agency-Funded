@@ -196,6 +196,12 @@ const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
+  const emailTo = order.customerDetails?.email || order.guestEmail;
+  if (emailTo) {
+    const t = templates.orderReceived(order.customerDetails?.firstName || "there", order.orderId);
+    await sendEmail({ to: emailTo, ...t });
+  }
+
   res.status(201).json({
     success: true,
     order,
