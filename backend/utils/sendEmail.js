@@ -9,6 +9,9 @@ function getTransporter() {
       port,
       secure: process.env.SMTP_SECURE === "true" || port === 465,
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
     });
   }
   return transporter;
@@ -38,6 +41,12 @@ async function sendEmail({ to, subject, html, text }) {
     console.error("sendEmail error:", err.code || "unknown", err.message);
     return { error: err.message };
   }
+}
+
+function sendEmailInBackground(options) {
+  sendEmail(options).catch((err) => {
+    console.error("Background email error:", err.code || "unknown", err.message);
+  });
 }
 
 const templates = {
@@ -79,4 +88,4 @@ const templates = {
   }),
 };
 
-module.exports = { sendEmail, templates };
+module.exports = { sendEmail, sendEmailInBackground, templates };
