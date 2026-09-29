@@ -12,7 +12,6 @@ const AuditLog = require("../models/AuditLog");
 const { generateOrderId, generateAccountNumber } = require("../utils/generateIds");
 const { computeOrderPricing, computeAffiliateCommission } = require("../utils/formulaEngine");
 const { sendEmail, templates } = require("../utils/sendEmail");
-const { enqueueEmail } = require("../utils/emailQueue");
 const generateToken = require("../utils/generateToken");
 
 const REFERRAL_ATTRIBUTION_DAYS = Number(process.env.REFERRAL_ATTRIBUTION_DAYS || 30);
@@ -200,7 +199,7 @@ const createOrder = asyncHandler(async (req, res) => {
   const emailTo = order.customerDetails?.email || order.guestEmail;
   if (emailTo) {
     const t = templates.orderReceived(order.customerDetails?.firstName || "there", order.orderId);
-    await enqueueEmail({ to: emailTo, ...t });
+    void sendEmail({ to: emailTo, ...t });
   }
 
   res.status(201).json({
@@ -265,7 +264,7 @@ const uploadPaymentProof = asyncHandler(async (req, res) => {
   const emailTo = order.customerDetails?.email || order.guestEmail;
   if (emailTo) {
     const t = templates.paymentUnderReview(order.customerDetails?.firstName || "there");
-    await enqueueEmail({ to: emailTo, ...t });
+    void sendEmail({ to: emailTo, ...t });
   }
 
   res.status(201).json({ success: true, order, proof });
