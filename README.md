@@ -35,7 +35,10 @@ cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, SMTP (optional)
 npm install
 npm run seed            # creates categories, templates, payment methods, FAQs, and a SUPER_ADMIN
 npm run dev              # http://localhost:5000
+# In a second terminal, start the durable email queue worker:
+npm run worker:email
 ```
+Run the API and email worker as separate processes in production, with the same MongoDB and SMTP environment variables. Order and payment-proof emails are saved to MongoDB before the API responds and retried by the worker if SMTP is unavailable.
 Seeded admin login: `admin@agencyfunded.com` / `ChangeMe123!` — **change this immediately**.
 
 ### Frontend

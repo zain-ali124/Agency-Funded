@@ -38,15 +38,9 @@ async function sendEmail({ to, subject, html, text }) {
     });
     return info;
   } catch (err) {
-    console.error("sendEmail error:", err.code || "unknown", err.message);
+    console.warn("[email:failed]", err.code || "unknown", err.message);
     return { error: err.message };
   }
-}
-
-function sendEmailInBackground(options) {
-  sendEmail(options).catch((err) => {
-    console.error("Background email error:", err.code || "unknown", err.message);
-  });
 }
 
 const templates = {
@@ -88,4 +82,4 @@ const templates = {
   }),
 };
 
-module.exports = { sendEmail, sendEmailInBackground, templates };
+module.exports = { sendEmail, templates };
