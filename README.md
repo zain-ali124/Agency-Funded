@@ -31,12 +31,15 @@ Given the PRD's ~150 sections, this build covers the full data model and every c
 ### Backend
 ```bash
 cd backend
-cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, SMTP (optional)
+cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, and email provider settings (optional)
 npm install
 npm run seed            # creates categories, templates, payment methods, FAQs, and a SUPER_ADMIN
 npm run dev              # http://localhost:5000
 ```
 Seeded admin login: `admin@agencyfunded.com` / `ChangeMe123!` — **change this immediately**.
+
+### Email delivery
+On Render Free, use Resend over HTTPS: set `RESEND_API_KEY` and `FROM_EMAIL` on the backend service. `FROM_EMAIL` must be an address on a domain verified in Resend. The order-received and payment-proof review emails are sent as soon as each request is saved. SMTP remains available when the host allows outbound SMTP connections.
 
 ### Frontend
 ```bash

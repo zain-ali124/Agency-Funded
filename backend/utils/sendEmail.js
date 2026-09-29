@@ -17,12 +17,59 @@ function getTransporter() {
   return transporter;
 }
 
+async function sendWithResend({ to, subject, html, text }) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.FROM_EMAIL,
+        to: [to],
+        subject,
+        html,
+        text: text || html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+      }),
+      signal: controller.signal,
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message = result.message || result.name || `HTTP ${response.status}`;
+      console.warn("[email:failed] Resend", message);
+      return { error: message };
+    }
+
+    console.log(`[email:sent] provider=resend id=${result.id || "accepted"}`);
+    return result;
+  } catch (err) {
+    console.warn("[email:failed] Resend", err.name === "AbortError" ? "request timeout" : err.message);
+    return { error: err.message };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /**
  * Central email sender. All PRD email templates (Section 92) route through here.
  * If SMTP isn't configured, logs instead of throwing so the rest of the flow
  * (order creation, approvals, etc.) never breaks because email is down.
  */
 async function sendEmail({ to, subject, html, text }) {
+  if (process.env.RESEND_API_KEY) {
+    if (!process.env.FROM_EMAIL) {
+      console.warn("[email:failed] Resend FROM_EMAIL is required");
+      return { error: "FROM_EMAIL is required when using Resend" };
+    }
+    console.log(`[email:sending] provider=resend to=${to} subject="${subject}"`);
+    return sendWithResend({ to, subject, html, text });
+  }
+
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.log(`[email:skipped - no SMTP configured] to=${to} subject="${subject}"`);
     return { skipped: true };
