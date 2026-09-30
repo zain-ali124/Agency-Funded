@@ -196,12 +196,6 @@ const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
-  const emailTo = order.customerDetails?.email || order.guestEmail;
-  if (emailTo) {
-    const t = templates.orderReceived(order.customerDetails?.firstName || "there", order.orderId);
-    void sendEmail({ to: emailTo, ...t });
-  }
-
   res.status(201).json({
     success: true,
     order,
@@ -263,7 +257,10 @@ const uploadPaymentProof = asyncHandler(async (req, res) => {
 
   const emailTo = order.customerDetails?.email || order.guestEmail;
   if (emailTo) {
-    const t = templates.paymentUnderReview(order.customerDetails?.firstName || "there");
+    const customerName = [order.customerDetails?.firstName, order.customerDetails?.lastName]
+      .filter(Boolean)
+      .join(" ") || "Client";
+    const t = templates.paymentUnderReview(customerName);
     void sendEmail({ to: emailTo, ...t });
   }
 

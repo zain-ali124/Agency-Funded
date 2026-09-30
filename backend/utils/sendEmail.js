@@ -96,8 +96,23 @@ const templates = {
     html: `<p>Hi ${name},</p><p>We have received your order ${orderId}. Please complete your payment and upload your payment proof from the checkout page so our team can review it.</p>`,
   }),
   paymentUnderReview: (name) => ({
-    subject: "Payment Review Request Received — Agency Funded",
-    html: `<p>Hi ${name},</p><p>Your payment review request has been received. Our team is reviewing your request now. Within 24 hours, or after the review is complete, we will send you a confirmation email with your funded account details.</p><p>Please keep your Agency Funded login email and the password you created at checkout available for signing in.</p>`,
+    subject: "Welcome to Agency Funded – Payment Processing",
+    html: `<p>Dear ${name},</p>
+      <p>Welcome to Agency Funded! <img src="https://fonts.gstatic.com/s/e/notoemoji/17.0/1f389/72.png" alt="🎉" width="24" height="24"></p>
+      <p>Thank you for choosing Agency Funded. We’re pleased to have you with us.</p>
+      <p>We have received your payment, and your transaction is currently being processed by our team.</p>
+      <p>Once the payment verification is completed, your trading/funded account details will be created and delivered to your registered email address within approximately 1 hour.</p>
+      <p><strong>What happens next?</strong></p>
+      <ul>
+        <li><img src="https://fonts.gstatic.com/s/e/notoemoji/17.0/2705/72.png" alt="✅" width="20" height="20"> Your payment is being verified</li>
+        <li><img src="https://fonts.gstatic.com/s/e/notoemoji/17.0/2705/72.png" alt="✅" width="20" height="20"> Your account is being prepared</li>
+        <li><img src="https://fonts.gstatic.com/s/e/notoemoji/17.0/2705/72.png" alt="✅" width="20" height="20"> Your account credentials will be sent to your registered email</li>
+        <li><img src="https://fonts.gstatic.com/s/e/notoemoji/17.0/23f1_fe0f/72.png" alt="⏱️" width="20" height="20"> Expected delivery: Within 1 hour</li>
+      </ul>
+      <p>You don't need to take any further action at this stage. Please keep an eye on your inbox, including your spam/junk folder.</p>
+      <p>If you have any questions or need assistance, our support team is available to help.</p>
+      <p>Thank you for choosing Agency Funded. We look forward to being part of your trading journey.</p>
+      <p>Best Regards,<br>Agency Funded<br>Client Support Team</p>`,
   }),
   paymentApproved: (name, orderId) => ({
     subject: "Payment Approved — Agency Funded",
