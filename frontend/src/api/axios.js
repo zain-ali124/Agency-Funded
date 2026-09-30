@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD
-  ? "https://api.agencyfunded.com/api"
+  ? "https://server.agencyfunded.com/api"
   : "/api");
 
 export const apiOrigin = apiBaseUrl.replace(/\/api\/?$/, "");
