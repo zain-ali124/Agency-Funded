@@ -15,8 +15,8 @@ const accountTemplateSchema = new mongoose.Schema(
     minTradingDays: { type: Number, default: 0 },
     minDailyProfitPercent: { type: Number, default: 0 },
 
-    profitTargetPercent: { type: Number, default: 8 },
-    profitTargetPerPhasePercent: { type: Number, default: 8 }, // for 3-step
+    profitTargetPercent: { type: Number, default: 12 },
+    profitTargetPerPhasePercent: { type: Number, default: 12 }, // for 3-step
 
     maxOverallLossPercent: { type: Number, required: true },
     overallLossType: { type: String, enum: ["STATIC", "TRAILING"], default: "STATIC" },
