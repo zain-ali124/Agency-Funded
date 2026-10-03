@@ -15,8 +15,8 @@ const accountTemplateSchema = new mongoose.Schema(
     minTradingDays: { type: Number, default: 0 },
     minDailyProfitPercent: { type: Number, default: 0 },
 
-    profitTargetPercent: { type: Number, default: 0 }, // 0/N-A for Instant
-    profitTargetPerPhasePercent: { type: Number, default: 0 }, // for 3-step
+    profitTargetPercent: { type: Number, default: 8 },
+    profitTargetPerPhasePercent: { type: Number, default: 8 }, // for 3-step
 
     maxOverallLossPercent: { type: Number, required: true },
     overallLossType: { type: String, enum: ["STATIC", "TRAILING"], default: "STATIC" },
@@ -33,12 +33,12 @@ const accountTemplateSchema = new mongoose.Schema(
     consistencyRulePercent: { type: Number, default: 0 },
 
     profitSplitDefault: { type: Number, default: 80 },
-    profitSplitMaximum: { type: Number, default: 100 },
+    profitSplitMaximum: { type: Number, default: 80 },
 
     refundable: { type: Boolean, default: true },
     refundAfterPayoutNumber: { type: Number, default: 3 },
 
-    payoutFirstDays: { type: Number, default: 14 },
+    payoutFirstDays: { type: Number, default: 8 },
     payoutRecurringDays: { type: Number, default: 14 },
     payoutMinimum: { type: Number, default: 0 },
 

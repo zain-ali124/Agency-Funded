@@ -31,8 +31,8 @@ export default function Rules() {
                 {items.map((t) => (
                   <tr key={t._id} className="border-b border-borderDark last:border-0 hover:bg-bgSecondary/40 transition-colors">
                     <td className="p-4 font-semibold text-brand">${t.accountSize.toLocaleString()}</td>
-                    <td>{t.model === "THREE_STEP" ? `${t.profitTargetPerPhasePercent}%/phase` : t.profitTargetPercent ? `${t.profitTargetPercent}%` : "N/A"}</td>
-                    <td>{t.maxOverallLossPercent}%</td><td>{t.maxDailyLossPercent}%</td><td>{t.minTradingDays}</td><td className="font-semibold">{t.profitSplitDefault}–{t.profitSplitMaximum}%</td>
+                    <td>{t.model === "THREE_STEP" ? `${t.profitTargetPerPhasePercent}%/phase` : `${t.profitTargetPercent}%`}</td>
+                    <td>{t.maxOverallLossPercent}%</td><td>{t.maxDailyLossPercent}%</td><td>{t.minTradingDays}</td><td className="font-semibold">{t.profitSplitDefault === t.profitSplitMaximum ? `${t.profitSplitDefault}%` : `${t.profitSplitDefault}–${t.profitSplitMaximum}%`}</td>
                   </tr>
                 ))}
               </tbody>
