@@ -16,24 +16,23 @@ export default function AccountDetail() {
   if (!template) return <div className="max-w-4xl mx-auto px-6 py-24 text-textMuted">Loading…</div>;
 
   const price = template.salePrice ?? template.originalPrice;
-  const rows = [
+  const rows = template.model === "INSTANT"
+    ? [
+      ["Max Overall Loss", `${template.maxOverallLossPercent}%`],
+      ["Daily Loss", `${template.maxDailyLossPercent}%`],
+    ]
+    : [
     ["Trading Period", template.tradingPeriod],
     ["Minimum Trading Days", template.minTradingDays],
-    ...(template.model === "INSTANT" ? [] : [
       template.model === "THREE_STEP"
         ? ["Profit Target (per phase)", `${template.profitTargetPerPhasePercent}%`]
         : ["Profit Target", `${template.profitTargetPercent}%`],
-    ]),
-    template.model === "INSTANT"
-      ? ["Max Overall Loss", `${template.maxOverallLossPercent}%`]
-      : ["Maximum Overall Loss", `${template.maxOverallLossPercent}% (${template.overallLossType.toLowerCase()})`],
-    template.model === "INSTANT"
-      ? ["Daily Loss", `${template.maxDailyLossPercent}%`]
-      : ["Maximum Daily Loss", `${template.maxDailyLossPercent}%`],
+    ["Maximum Overall Loss", `${template.maxOverallLossPercent}% (${template.overallLossType.toLowerCase()})`],
+    ["Maximum Daily Loss", `${template.maxDailyLossPercent}%`],
     ["Expert Advisors", template.eaAllowed ? "Allowed" : "Not Allowed"],
-    ...(template.model === "INSTANT" ? [] : [["Profit Split", template.profitSplitDefault === template.profitSplitMaximum
+    ["Profit Split", template.profitSplitDefault === template.profitSplitMaximum
       ? `${template.profitSplitDefault}%`
-      : `${template.profitSplitDefault}% default / up to ${template.profitSplitMaximum}%`]]),
+      : `${template.profitSplitDefault}% default / up to ${template.profitSplitMaximum}%`],
     ["Refund", template.refundable ? `After ${template.refundAfterPayoutNumber}th payout` : "Not refundable"],
     ["Payout Schedule", `First payout in ${template.payoutFirstDays} days, then every ${template.payoutRecurringDays} days`],
   ];
