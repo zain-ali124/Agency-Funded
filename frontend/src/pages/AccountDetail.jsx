@@ -27,6 +27,9 @@ export default function AccountDetail() {
     ["Maximum Overall Loss", `${template.maxOverallLossPercent}% (${template.overallLossType.toLowerCase()})`],
     ["Maximum Daily Loss", `${template.maxDailyLossPercent}%`],
     ["Expert Advisors", template.eaAllowed ? "Allowed" : "Not Allowed"],
+    ["Profit Split", template.profitSplitDefault === template.profitSplitMaximum
+      ? `${template.profitSplitDefault}%`
+      : `${template.profitSplitDefault}% default / up to ${template.profitSplitMaximum}%`],
     ["Refund", template.refundable ? `After ${template.refundAfterPayoutNumber}th payout` : "Not refundable"],
     ["Payout Schedule", `First payout in ${template.payoutFirstDays} days, then every ${template.payoutRecurringDays} days`],
   ];

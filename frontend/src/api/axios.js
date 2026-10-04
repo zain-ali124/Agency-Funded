@@ -13,10 +13,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("agency_funded_token");
-  const isPublicCatalogRead = config.method === "get"
-    && config.url?.startsWith("/accounts-catalog/")
-    && config.params?.admin !== true;
-  if (token && !isPublicCatalogRead) config.headers.Authorization = `Bearer ${token}`;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

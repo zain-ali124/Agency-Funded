@@ -20,8 +20,6 @@ app.use(helmet());
 const allowedOrigins = [
 	process.env.FRONTEND_URL,
 	process.env.CLIENT_URL,
-	"https://agencyfunded.com",
-	"https://www.agencyfunded.com",
 	"http://localhost:5173",
 ]
 	.filter(Boolean)
