@@ -20,6 +20,8 @@ app.use(helmet());
 const allowedOrigins = [
 	process.env.FRONTEND_URL,
 	process.env.CLIENT_URL,
+	"https://agencyfunded.com",
+	"https://www.agencyfunded.com",
 	"http://localhost:5173",
 ]
 	.filter(Boolean)
@@ -31,6 +33,7 @@ app.use(cors({
 		callback(null, !origin || allowedOrigins.includes(normalizedOrigin));
 	},
 	credentials: true,
+	optionsSuccessStatus: 204,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
