@@ -24,7 +24,7 @@ export default function Rules() {
             <table className="w-full min-w-[720px] text-sm">
               <thead className="text-textMuted text-left border-b border-borderDark bg-bgSecondary/60">
                 <tr>
-                  <th className="p-4 font-medium">Size</th><th className="font-medium">Profit Target</th><th className="font-medium">Max Overall Loss</th><th className="font-medium">Daily Loss</th><th className="font-medium">Min Days</th><th className="font-medium">Profit Split</th>
+                  <th className="p-4 font-medium">Size</th><th className="font-medium">Profit Target</th><th className="font-medium">Max Overall Loss</th><th className="font-medium">Daily Loss</th><th className="font-medium">Min Days</th>
                 </tr>
               </thead>
               <tbody>
@@ -32,7 +32,7 @@ export default function Rules() {
                   <tr key={t._id} className="border-b border-borderDark last:border-0 hover:bg-bgSecondary/40 transition-colors">
                     <td className="p-4 font-semibold text-brand">${t.accountSize.toLocaleString()}</td>
                     <td>{t.model === "THREE_STEP" ? `${t.profitTargetPerPhasePercent}%/phase` : `${t.profitTargetPercent}%`}</td>
-                    <td>{t.maxOverallLossPercent}%</td><td>{t.maxDailyLossPercent}%</td><td>{t.minTradingDays}</td><td className="font-semibold">{t.profitSplitDefault === t.profitSplitMaximum ? `${t.profitSplitDefault}%` : `${t.profitSplitDefault}–${t.profitSplitMaximum}%`}</td>
+                    <td>{t.maxOverallLossPercent}%</td><td>{t.maxDailyLossPercent}%</td><td>{t.minTradingDays}</td>
                   </tr>
                 ))}
               </tbody>

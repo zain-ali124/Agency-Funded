@@ -24,7 +24,6 @@ export default function AccountCard({ template }) {
         <li>Profit Target: <span className="text-white">{template.model === "THREE_STEP" ? template.profitTargetPerPhasePercent : template.profitTargetPercent}%{template.model === "THREE_STEP" ? " / phase" : ""}</span></li>
         <li>Max Overall Loss: <span className="text-white">{template.maxOverallLossPercent}%</span></li>
         <li>Daily Loss: <span className="text-white">{template.maxDailyLossPercent}%</span></li>
-        <li>Profit Split: <span className="text-white">{template.profitSplitDefault === template.profitSplitMaximum ? `${template.profitSplitDefault}%` : `Up to ${template.profitSplitMaximum}%`}</span></li>
       </ul>
       <Link to={`/accounts/${template._id}`} className="btn-primary text-center mt-2">Get Funded →</Link>
     </div>
