@@ -89,7 +89,7 @@ async function seed() {
     refundable: true,
     refundAfterPayoutNumber: 3,
     payoutFirstDays: 8,
-    payoutRecurringDays: 14,
+    payoutRecurringDays: 5,
     phases: 1,
   };
   const oneStepSizes = [
