@@ -31,26 +31,13 @@ const profitShare = (eligibleProfit, profitSplitPercent) =>
   round2(eligibleProfit * (profitSplitPercent / 100));
 
 /**
- * An approved affiliate referral keeps the customer price at the listed price;
- * promotional coupons remain unavailable for that order.
- * Otherwise, apply a valid coupon or use the listed price.
+ * Affiliate referrals never discount the customer price. A valid coupon can
+ * still discount an order attributed to an affiliate.
  */
 const AFFILIATE_COMMISSION_PERCENT = 40;
 
-function computeOrderPricing({ originalPrice, hasApprovedReferral, couponPercent }) {
+function computeOrderPricing({ originalPrice, couponPercent }) {
   const base = originalPrice;
-
-  if (hasApprovedReferral) {
-    return {
-      originalPrice: base,
-      couponPercentage: 0,
-      couponDiscount: 0,
-      referralPercentage: 0,
-      referralDiscount: 0,
-      finalPrice: base,
-      discountSource: "REFERRAL",
-    };
-  }
 
   if (couponPercent && couponPercent > 0) {
     const couponDiscount = round2(base * (couponPercent / 100));

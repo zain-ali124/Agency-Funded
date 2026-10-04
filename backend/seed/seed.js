@@ -6,6 +6,7 @@ const AccountCategory = require("../models/AccountCategory");
 const AccountTemplate = require("../models/AccountTemplate");
 const PaymentMethod = require("../models/PaymentMethod");
 const FAQ = require("../models/FAQ");
+const Coupon = require("../models/Coupon");
 
 async function seed() {
   await connectDB();
@@ -142,6 +143,26 @@ async function seed() {
   await upsertTemplates(oneStepRules, oneStepSizes);
   await upsertTemplates(threeStepRules, threeStepSizes);
 
+  // ----- Welcome coupon -----
+  await Coupon.findOneAndUpdate(
+    { code: "AGENCY20" },
+    {
+      $set: {
+        discountPercent: 20,
+        startDate: null,
+        expiryDate: null,
+        maxUses: null,
+        minimumOrder: 0,
+        applicableCategory: null,
+        applicableModel: "ALL",
+        applicableTemplates: [],
+        active: true,
+      },
+      $setOnInsert: { timesUsed: 0 },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
   // ----- Payment methods (PRD Section 42/124) -----
   const paymentMethods = [
     { methodName: "Bank Transfer", accountName: "Agency Funded", instructions: "Send exact amount and upload your transfer receipt.", displayOrder: 1 },
@@ -159,11 +180,17 @@ async function seed() {
     { question: "What is Agency Funded?", answer: "Agency Funded provides access to funded trading accounts through Instant, 1-Step and 3-Step programs, with transparent, database-driven rules.", category: "General", displayOrder: 1 },
     { question: "What is 1-Step?", answer: "1-Step is a single evaluation phase: reach the profit target while respecting the daily and overall loss limits, then get funded.", category: "Accounts", displayOrder: 1 },
     { question: "Can I buy without registering?", answer: "Yes, guest checkout is supported. You can also register to track your orders and accounts in one place.", category: "Payment", displayOrder: 1 },
-    { question: "Can coupons and affiliate referrals be combined?", answer: "No. Affiliate referrals do not discount the account price, and promotional coupons cannot be used on an affiliate-referred order.", category: "Affiliate", displayOrder: 1 },
+    { question: "Can coupons and affiliate referrals be combined?", answer: "Yes. An affiliate referral does not reduce your account price, and an eligible coupon can still give you a discount. The affiliate earns a commission for the referral.", category: "Affiliate", displayOrder: 1 },
   ];
   for (const f of faqs) {
-    const exists = await FAQ.findOne({ question: f.question });
-    if (!exists) await FAQ.create(f);
+    await FAQ.findOneAndUpdate(
+      { question: f.question },
+      {
+        $set: { answer: f.answer },
+        $setOnInsert: { question: f.question, category: f.category, displayOrder: f.displayOrder },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
   }
 
   console.log("Seeding complete.");

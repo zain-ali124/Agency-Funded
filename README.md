@@ -11,14 +11,14 @@ A database-driven funded-trading platform (MongoDB, Express, React, Node) built 
 - Full checkout flow: quote → create order → upload payment proof → admin approve/reject → automatic trading-account creation with rule snapshot → email
 - Affiliate flow: apply → admin approve → referral link/click tracking → listed account price for customers / 40% commission for affiliates (computed off the listed price) → withdrawals
 - Admin: dashboard metrics, order/payment review, account template & pricing editor, per-account trading-stats editor with overrides, audit log, affiliate application/commission/withdrawal management
-- Seed script with your **exact PRD pricing** (Instant $100/$160, 2-Step $50/$90/$140/$300/$500; 3-Step left inactive/admin-configurable since no price was supplied)
+- Seed script with your **exact PRD pricing** (Instant $100/$160, 2-Step $50/$90/$140/$300/$500; 3-Step left inactive/admin-configurable since no price was supplied) and the active `AGENCY20` coupon for 20% off
 - Security: bcrypt password hashing, HTTP-only cookies, helmet, mongo-sanitize, xss-clean, rate limiting, multer file-type/size validation, full audit logging on every rule/price/status change
 
 **Frontend (complete, builds cleanly with `npm run build`):**
 - React + Vite + Tailwind, using the exact dark/green design system from your UI spec (`#050505` bg, `#00E676` accent, Inter font, card/border tokens)
 - Public: Home, Accounts catalog (model filter), Account Detail, How It Works, Trading Rules (auto-generated from live templates), FAQ
 - Auth: Login, Register (with referral-code capture from `?ref=`)
-- Checkout: live price quote, coupon field, referral auto-apply (coupon disabled when referral active — enforces the no-stack rule), payment method selection, payment-proof upload
+- Checkout: live price quote, coupon field, referral auto-apply (affiliate referrals earn commission without reducing customer price; coupons can still apply), payment method selection, payment-proof upload
 - Customer Dashboard: per-account balance/equity/profit/loss with progress bars for profit target, daily loss and overall loss
 - Affiliate: apply form → pending state → full affiliate dashboard (clicks, referrals, commissions, referral link) once approved
 - Admin: metrics overview, payment-proof review queue (approve/reject), live pricing editor, affiliate application review

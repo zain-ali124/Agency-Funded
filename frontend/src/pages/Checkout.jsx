@@ -178,19 +178,12 @@ export default function Checkout() {
 
           <div className="mb-4">
             <input placeholder="Coupon code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)}
-              disabled={pricing.discountSource === "REFERRAL"}
               className="w-full bg-bgSecondary border border-borderDark rounded-sm px-4 py-2 text-sm disabled:opacity-50" />
             {couponError && <p className="text-warning text-xs mt-1">{couponError}</p>}
           </div>
 
           <div className="space-y-2 text-sm border-t border-borderDark pt-4">
             <div className="flex justify-between"><span className="text-textMuted">Original Price</span><span>${pricing.originalPrice}</span></div>
-            {pricing.discountSource === "REFERRAL" && (
-              <p className="text-xs text-textMuted">Affiliate referral applied — your account price stays the same, and the affiliate earns commission.</p>
-            )}
-            {pricing.referralDiscount > 0 && (
-              <div className="flex justify-between text-brand"><span>Referral Discount ({pricing.referralPercentage}%)</span><span>-${pricing.referralDiscount}</span></div>
-            )}
             {pricing.couponDiscount > 0 && (
               <div className="flex justify-between text-brand"><span>Coupon Discount ({pricing.couponPercentage}%)</span><span>-${pricing.couponDiscount}</span></div>
             )}

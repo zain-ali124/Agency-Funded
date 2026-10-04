@@ -26,7 +26,6 @@ const quoteOrder = asyncHandler(async (req, res) => {
   }
   const originalPrice = template.salePrice ?? template.originalPrice;
 
-  let hasApprovedReferral = false;
   let resolvedAffiliate = null;
   const registeredAffiliate = req.user?.referredBy
     ? await User.findOne({ _id: req.user.referredBy, affiliateStatus: "APPROVED" })
@@ -34,27 +33,23 @@ const quoteOrder = asyncHandler(async (req, res) => {
   if (referralCode) {
     resolvedAffiliate = await User.findOne({ referralCode: referralCode.toUpperCase(), affiliateStatus: "APPROVED" });
     resolvedAffiliate = resolvedAffiliate || registeredAffiliate;
-    hasApprovedReferral = !!resolvedAffiliate;
   } else if (registeredAffiliate) {
     resolvedAffiliate = registeredAffiliate;
-    hasApprovedReferral = true;
   }
 
   let couponPercent = 0;
   let couponError = null;
-  if (couponCode && !hasApprovedReferral) {
-    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+  if (couponCode) {
+    const coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase() });
     if (!coupon) couponError = "Coupon not found";
     else {
       const check = coupon.isValidForOrder({ orderAmount: originalPrice, templateId, model: template.model });
       if (!check.valid) couponError = check.reason;
       else couponPercent = coupon.discountPercent;
     }
-  } else if (couponCode && hasApprovedReferral) {
-    couponError = "Affiliate referral applied. Promotional coupons cannot be combined with referral orders.";
   }
 
-  const pricing = computeOrderPricing({ originalPrice, hasApprovedReferral, couponPercent });
+  const pricing = computeOrderPricing({ originalPrice, couponPercent });
 
   res.json({ success: true, pricing, couponError, affiliateApplied: !!resolvedAffiliate });
 });
@@ -116,7 +111,6 @@ const createOrder = asyncHandler(async (req, res) => {
   const originalPrice = template.salePrice ?? template.originalPrice;
 
   // Affiliate referrals attribute commission without reducing the account price.
-  let hasApprovedReferral = false;
   let resolvedAffiliate = null;
   const registeredAffiliate = req.user?.referredBy
     ? await User.findOne({ _id: req.user.referredBy, affiliateStatus: "APPROVED" })
@@ -124,24 +118,27 @@ const createOrder = asyncHandler(async (req, res) => {
   if (referralCode) {
     resolvedAffiliate = await User.findOne({ referralCode: referralCode.toUpperCase(), affiliateStatus: "APPROVED" });
     resolvedAffiliate = resolvedAffiliate || registeredAffiliate;
-    hasApprovedReferral = !!resolvedAffiliate;
   } else if (registeredAffiliate) {
     resolvedAffiliate = registeredAffiliate;
-    hasApprovedReferral = true;
   }
 
   let couponPercent = 0;
   let coupon = null;
-  if (couponCode && !hasApprovedReferral) {
-    coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
-    if (coupon) {
-      const check = coupon.isValidForOrder({ orderAmount: originalPrice, templateId, model: template.model });
-      if (check.valid) couponPercent = coupon.discountPercent;
-      else coupon = null;
+  if (couponCode) {
+    coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase() });
+    if (!coupon) {
+      res.status(400);
+      throw new Error("Coupon not found");
     }
+    const check = coupon.isValidForOrder({ orderAmount: originalPrice, templateId, model: template.model });
+    if (!check.valid) {
+      res.status(400);
+      throw new Error(check.reason);
+    }
+    couponPercent = coupon.discountPercent;
   }
 
-  const pricing = computeOrderPricing({ originalPrice, hasApprovedReferral, couponPercent });
+  const pricing = computeOrderPricing({ originalPrice, couponPercent });
 
   const order = await Order.create({
     orderId: generateOrderId(),
