@@ -54,8 +54,7 @@ export default function Checkout() {
         password: user ? undefined : password,
         termsAccepted: true, termsVersion: "v1",
       });
-      if (data.token) {
-        localStorage.setItem("agency_funded_token", data.token);
+      if (data.user) {
         await refreshUser();
       }
       setOrder(data.order);

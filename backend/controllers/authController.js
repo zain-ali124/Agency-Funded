@@ -80,7 +80,6 @@ const register = asyncHandler(async (req, res) => {
       email: user.email,
       role: user.role,
     },
-    token,
   });
 });
 
@@ -108,7 +107,6 @@ const login = asyncHandler(async (req, res) => {
       affiliateStatus: user.affiliateStatus,
       referralCode: user.referralCode,
     },
-    token,
   });
 });
 

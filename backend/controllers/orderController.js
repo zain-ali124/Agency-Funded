@@ -196,10 +196,18 @@ const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
+  if (createdUserToken) {
+    res.cookie("token", createdUserToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   res.status(201).json({
     success: true,
     order,
-    token: createdUserToken,
     user: createdUserToken ? {
       id: checkoutUser._id,
       firstName: checkoutUser.firstName,

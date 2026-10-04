@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/axios";
 
 const AuthContext = createContext(null);
-const TOKEN_KEY = "agency_funded_token";
+const LEGACY_TOKEN_KEY = "agency_funded_token";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -20,19 +20,20 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    // Authentication now uses the HTTP-only cookie set by the API.
+    // Remove any bearer token saved by older frontend builds.
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
     refreshUser();
   }, []);
 
   const login = async (email, password) => {
     const { data } = await api.post("/auth/login", { email, password });
-    localStorage.setItem(TOKEN_KEY, data.token);
     setUser(data.user);
     return data.user;
   };
 
   const register = async (payload) => {
     const { data } = await api.post("/auth/register", payload);
-    localStorage.setItem(TOKEN_KEY, data.token);
     setUser(data.user);
     return data.user;
   };
@@ -41,7 +42,7 @@ export function AuthProvider({ children }) {
     try {
       await api.post("/auth/logout");
     } finally {
-      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
       setUser(null);
     }
   };
