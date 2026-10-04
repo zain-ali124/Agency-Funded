@@ -185,6 +185,9 @@ export default function Checkout() {
 
           <div className="space-y-2 text-sm border-t border-borderDark pt-4">
             <div className="flex justify-between"><span className="text-textMuted">Original Price</span><span>${pricing.originalPrice}</span></div>
+            {pricing.discountSource === "REFERRAL" && (
+              <p className="text-xs text-textMuted">Affiliate referral applied — your account price stays the same, and the affiliate earns commission.</p>
+            )}
             {pricing.referralDiscount > 0 && (
               <div className="flex justify-between text-brand"><span>Referral Discount ({pricing.referralPercentage}%)</span><span>-${pricing.referralDiscount}</span></div>
             )}

@@ -159,7 +159,7 @@ async function seed() {
     { question: "What is Agency Funded?", answer: "Agency Funded provides access to funded trading accounts through Instant, 1-Step and 3-Step programs, with transparent, database-driven rules.", category: "General", displayOrder: 1 },
     { question: "What is 1-Step?", answer: "1-Step is a single evaluation phase: reach the profit target while respecting the daily and overall loss limits, then get funded.", category: "Accounts", displayOrder: 1 },
     { question: "Can I buy without registering?", answer: "Yes, guest checkout is supported. You can also register to track your orders and accounts in one place.", category: "Payment", displayOrder: 1 },
-    { question: "Can coupons and referral discounts combine?", answer: "No. If an approved referral discount is active, it is applied instead of any coupon; they never stack.", category: "Affiliate", displayOrder: 1 },
+    { question: "Can coupons and affiliate referrals be combined?", answer: "No. Affiliate referrals do not discount the account price, and promotional coupons cannot be used on an affiliate-referred order.", category: "Affiliate", displayOrder: 1 },
   ];
   for (const f of faqs) {
     const exists = await FAQ.findOne({ question: f.question });

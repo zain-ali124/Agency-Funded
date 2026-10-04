@@ -31,27 +31,23 @@ const profitShare = (eligibleProfit, profitSplitPercent) =>
   round2(eligibleProfit * (profitSplitPercent / 100));
 
 /**
- * Discount Priority Engine (PRD Section 110)
- * IF approved referral exists -> apply referral discount, ignore coupon.
- * ELSE IF valid coupon exists -> apply coupon.
- * ELSE -> original/sale price.
- * Referral and coupon discounts NEVER stack.
+ * An approved affiliate referral keeps the customer price at the listed price;
+ * promotional coupons remain unavailable for that order.
+ * Otherwise, apply a valid coupon or use the listed price.
  */
-const REFERRAL_DISCOUNT_PERCENT = 40;
 const AFFILIATE_COMMISSION_PERCENT = 40;
 
 function computeOrderPricing({ originalPrice, hasApprovedReferral, couponPercent }) {
   const base = originalPrice;
 
   if (hasApprovedReferral) {
-    const referralDiscount = round2(base * (REFERRAL_DISCOUNT_PERCENT / 100));
     return {
       originalPrice: base,
       couponPercentage: 0,
       couponDiscount: 0,
-      referralPercentage: REFERRAL_DISCOUNT_PERCENT,
-      referralDiscount,
-      finalPrice: round2(base - referralDiscount),
+      referralPercentage: 0,
+      referralDiscount: 0,
+      finalPrice: base,
       discountSource: "REFERRAL",
     };
   }
@@ -96,6 +92,5 @@ module.exports = {
   profitShare,
   computeOrderPricing,
   computeAffiliateCommission,
-  REFERRAL_DISCOUNT_PERCENT,
   AFFILIATE_COMMISSION_PERCENT,
 };

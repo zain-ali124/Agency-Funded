@@ -7,9 +7,9 @@ A database-driven funded-trading platform (MongoDB, Express, React, Node) built 
 **Backend (complete, runnable):**
 - Auth (JWT via HTTP-only cookie) with RBAC (`CUSTOMER`, `AFFILIATE`, `ADMIN`, `SUPER_ADMIN`, `FINANCE_ADMIN`, `TRADING_ADMIN`, `CONTENT_ADMIN`, `AFFILIATE_ADMIN`, `SUPPORT_ADMIN`)
 - 17 Mongoose models covering categories, admin-editable account templates, purchased accounts with immutable rule snapshots + per-account overrides, orders, coupons, payment methods/proofs, affiliates/referrals/commissions/withdrawals, payouts, audit logs, FAQs, testimonials
-- Centralized **Formula Engine** (`utils/formulaEngine.js`) — profit target, overall/daily loss, drawdown floors, consistency %, profit share, and the **Discount Priority Engine** (referral beats coupon, never stack, PRD §110/36)
+- Centralized **Formula Engine** (`utils/formulaEngine.js`) — profit target, overall/daily loss, drawdown floors, consistency %, profit share, coupons, and affiliate commission pricing
 - Full checkout flow: quote → create order → upload payment proof → admin approve/reject → automatic trading-account creation with rule snapshot → email
-- Affiliate flow: apply → admin approve → referral link/click tracking → 40% referral discount / 40% commission (computed off original price) → withdrawals
+- Affiliate flow: apply → admin approve → referral link/click tracking → listed account price for customers / 40% commission for affiliates (computed off the listed price) → withdrawals
 - Admin: dashboard metrics, order/payment review, account template & pricing editor, per-account trading-stats editor with overrides, audit log, affiliate application/commission/withdrawal management
 - Seed script with your **exact PRD pricing** (Instant $100/$160, 2-Step $50/$90/$140/$300/$500; 3-Step left inactive/admin-configurable since no price was supplied)
 - Security: bcrypt password hashing, HTTP-only cookies, helmet, mongo-sanitize, xss-clean, rate limiting, multer file-type/size validation, full audit logging on every rule/price/status change
@@ -52,7 +52,7 @@ npm run dev               # http://localhost:5173 (proxies /api to :5000)
 - **Admin → Database → Website**: every price/rule lives in `AccountTemplate` and is edited via `/admin/templates` — no hard-coded values in the UI.
 - **Rule Snapshot** (§52): on approval, `Account.ruleSnapshot` freezes the template's rules at that moment; later template edits never retroactively change existing customer accounts.
 - **Per-account overrides** (§51/113): `Account.overrides` layers on top of the snapshot for one customer only, fully audit-logged.
-- **Discount Priority Engine** (§110): implemented once in `formulaEngine.computeOrderPricing` and reused by both the quote and order-creation endpoints so pricing can never drift between preview and checkout.
+- **Order Pricing**: coupon discounts are computed in `formulaEngine.computeOrderPricing` and reused by quote and order creation. Affiliate referrals do not reduce customer prices; they attribute the sale for commission.
 97
 
 What Really Happened to Flight 19? The Official Navy Record

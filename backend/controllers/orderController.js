@@ -10,7 +10,7 @@ const AffiliateCommission = require("../models/AffiliateCommission");
 const User = require("../models/User");
 const AuditLog = require("../models/AuditLog");
 const { generateOrderId, generateAccountNumber } = require("../utils/generateIds");
-const { computeOrderPricing, computeAffiliateCommission } = require("../utils/formulaEngine");
+const { computeOrderPricing, computeAffiliateCommission, AFFILIATE_COMMISSION_PERCENT } = require("../utils/formulaEngine");
 const { sendEmail, templates } = require("../utils/sendEmail");
 const generateToken = require("../utils/generateToken");
 
@@ -51,7 +51,7 @@ const quoteOrder = asyncHandler(async (req, res) => {
       else couponPercent = coupon.discountPercent;
     }
   } else if (couponCode && hasApprovedReferral) {
-    couponError = "Referral discount is active. Promotional coupons cannot be combined with referral discounts.";
+    couponError = "Affiliate referral applied. Promotional coupons cannot be combined with referral orders.";
   }
 
   const pricing = computeOrderPricing({ originalPrice, hasApprovedReferral, couponPercent });
@@ -115,7 +115,7 @@ const createOrder = asyncHandler(async (req, res) => {
   const orderCustomerDetails = { ...customerDetails, email: checkoutUser.email };
   const originalPrice = template.salePrice ?? template.originalPrice;
 
-  // Discount Priority Engine: referral beats coupon, never stack (PRD 110/36)
+  // Affiliate referrals attribute commission without reducing the account price.
   let hasApprovedReferral = false;
   let resolvedAffiliate = null;
   const registeredAffiliate = req.user?.referredBy
@@ -366,7 +366,7 @@ const adminApproveOrder = asyncHandler(async (req, res) => {
       affiliate: order.affiliateId,
       order: order._id,
       originalPrice: order.originalPrice,
-      commissionPercent: 40,
+      commissionPercent: AFFILIATE_COMMISSION_PERCENT,
       commissionAmount,
       status: "PENDING",
     });
