@@ -15,6 +15,9 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 connectDB();
 
 const app = express();
+// The hosting platform's reverse proxy supplies X-Forwarded-For.
+// Trust only the immediate proxy so rate limiting uses the client IP safely.
+app.set("trust proxy", 1);
 
 app.use(helmet());
 const allowedOrigins = [

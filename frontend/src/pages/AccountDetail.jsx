@@ -19,17 +19,21 @@ export default function AccountDetail() {
   const rows = [
     ["Trading Period", template.tradingPeriod],
     ["Minimum Trading Days", template.minTradingDays],
-    template.model === "THREE_STEP"
-      ? ["Profit Target (per phase)", `${template.profitTargetPerPhasePercent}%`]
-      : template.model === "ONE_STEP"
-      ? ["Profit Target", `${template.profitTargetPercent}%`]
-      : ["Profit Target", "N/A"],
-    ["Maximum Overall Loss", `${template.maxOverallLossPercent}% (${template.overallLossType.toLowerCase()})`],
-    ["Maximum Daily Loss", `${template.maxDailyLossPercent}%`],
+    ...(template.model === "INSTANT" ? [] : [
+      template.model === "THREE_STEP"
+        ? ["Profit Target (per phase)", `${template.profitTargetPerPhasePercent}%`]
+        : ["Profit Target", `${template.profitTargetPercent}%`],
+    ]),
+    template.model === "INSTANT"
+      ? ["Max Overall Loss", `${template.maxOverallLossPercent}%`]
+      : ["Maximum Overall Loss", `${template.maxOverallLossPercent}% (${template.overallLossType.toLowerCase()})`],
+    template.model === "INSTANT"
+      ? ["Daily Loss", `${template.maxDailyLossPercent}%`]
+      : ["Maximum Daily Loss", `${template.maxDailyLossPercent}%`],
     ["Expert Advisors", template.eaAllowed ? "Allowed" : "Not Allowed"],
-    ["Profit Split", template.profitSplitDefault === template.profitSplitMaximum
+    ...(template.model === "INSTANT" ? [] : [["Profit Split", template.profitSplitDefault === template.profitSplitMaximum
       ? `${template.profitSplitDefault}%`
-      : `${template.profitSplitDefault}% default / up to ${template.profitSplitMaximum}%`],
+      : `${template.profitSplitDefault}% default / up to ${template.profitSplitMaximum}%`]]),
     ["Refund", template.refundable ? `After ${template.refundAfterPayoutNumber}th payout` : "Not refundable"],
     ["Payout Schedule", `First payout in ${template.payoutFirstDays} days, then every ${template.payoutRecurringDays} days`],
   ];
