@@ -34,7 +34,7 @@ const profitShare = (eligibleProfit, profitSplitPercent) =>
  * Affiliate referrals never discount the customer price. A valid coupon can
  * still discount an order attributed to an affiliate.
  */
-const AFFILIATE_COMMISSION_PERCENT = 40;
+const AFFILIATE_COMMISSION_PERCENT = 25;
 
 function computeOrderPricing({ originalPrice, couponPercent }) {
   const base = originalPrice;
