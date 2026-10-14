@@ -11,7 +11,7 @@ A database-driven funded-trading platform (MongoDB, Express, React, Node) built 
 - Full checkout flow: quote → create order → upload payment proof → admin approve/reject → automatic trading-account creation with rule snapshot → email
 - Affiliate flow: apply → admin approve → referral link/click tracking → listed account price for customers / 25% commission for affiliates (computed off the listed price) → withdrawals
 - Admin: dashboard metrics, order/payment review, account template & pricing editor, per-account trading-stats editor with overrides, audit log, affiliate application/commission/withdrawal management
-- Seed script with your **exact PRD pricing** (Instant $100/$160, 2-Step $50/$90/$140/$300/$500; 3-Step left inactive/admin-configurable since no price was supplied) and the active `AGENCY20` coupon for 20% off
+- Seed script with your **exact PRD pricing** (Instant $100/$160, 2-Step 5K/10K/25K/50K/100K at $50/$90/$140/$300/$500; 3-Step left inactive/admin-configurable since no price was supplied) and the active `AGENCY20` coupon for 20% off
 - Security: bcrypt password hashing, HTTP-only cookies, helmet, mongo-sanitize, xss-clean, rate limiting, multer file-type/size validation, full audit logging on every rule/price/status change
 
 **Frontend (complete, builds cleanly with `npm run build`):**

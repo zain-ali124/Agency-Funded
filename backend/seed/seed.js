@@ -142,6 +142,10 @@ async function seed() {
   await upsertTemplates(instantRules, instantSizes);
   await upsertTemplates(oneStepRules, oneStepSizes);
   await upsertTemplates(threeStepRules, threeStepSizes);
+  await AccountTemplate.updateOne(
+    { model: "ONE_STEP", accountSize: 20000 },
+    { $set: { active: false } }
+  );
 
   // ----- Welcome coupon -----
   await Coupon.findOneAndUpdate(
