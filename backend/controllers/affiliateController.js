@@ -5,6 +5,7 @@ const Referral = require("../models/Referral");
 const AffiliateCommission = require("../models/AffiliateCommission");
 const AffiliateWithdrawal = require("../models/AffiliateWithdrawal");
 const { generateReferralCode } = require("../utils/generateIds");
+const { AFFILIATE_COMMISSION_PERCENT } = require("../utils/formulaEngine");
 const { sendEmail, templates } = require("../utils/sendEmail");
 
 // @route POST /api/affiliate/apply
@@ -96,6 +97,7 @@ const getAffiliateDashboard = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
+    commissionPercent: AFFILIATE_COMMISSION_PERCENT,
     referralCode: req.user.referralCode,
     referralLink: `${process.env.CLIENT_URL}/?ref=${req.user.referralCode}`,
     stats: {

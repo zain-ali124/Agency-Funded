@@ -69,6 +69,7 @@ export default function Affiliate() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 pb-28">
         <h1 className="text-2xl font-extrabold mb-8">Affiliate Dashboard</h1>
+        <p className="text-sm text-textMuted mb-6">Earn {dashboard.commissionPercent}% commission on the original account price for each referred purchase.</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="card p-5"><div className="label-muted">Total Clicks</div><div className="text-2xl font-extrabold">{dashboard.stats.totalClicks}</div></div>
           <div className="card p-5"><div className="label-muted">Referrals</div><div className="text-2xl font-extrabold">{dashboard.stats.registeredReferrals}</div></div>
