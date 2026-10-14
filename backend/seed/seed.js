@@ -95,7 +95,7 @@ async function seed() {
   const oneStepSizes = [
     { accountSize: 5000, originalPrice: 50 },
     { accountSize: 10000, originalPrice: 90 },
-    { accountSize: 20000, originalPrice: 140 },
+    { accountSize: 25000, originalPrice: 140 },
     { accountSize: 50000, originalPrice: 300 },
     { accountSize: 100000, originalPrice: 500 },
   ];
